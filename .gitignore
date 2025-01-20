@@ -10,3 +10,7 @@ yarn-cache/
 
 # Log
 logs/
+
+# ENV
+.env
+.prod.env
