@@ -1,18 +1,19 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
-const { mapDBToModel } = require('../../utils');
 const NotFoundError = require('../../exceptions/NotFoundError');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
-const CollaborationsService = require('./CollaborationsService');
+const { mapDBToModel } = require('../../utils');
 
 class NotesService {
-  constructor() {
+  constructor(collaborationService) {
     this._pool = new Pool();
-    this._collaborationService = CollaborationsService;
+    this._collaborationService = collaborationService;
   }
 
-  async addNote({ title, body, tags, owner }) {
+  async addNote({
+    title, body, tags, owner,
+  }) {
     const id = nanoid(16);
     const createdAt = new Date().toISOString();
     const updatedAt = createdAt;
@@ -45,7 +46,10 @@ class NotesService {
 
   async getNoteById(id) {
     const query = {
-      text: 'SELECT * FROM notes WHERE id = $1',
+      text: `SELECT notes.*, users.username
+    FROM notes
+    LEFT JOIN users ON users.id = notes.owner
+    WHERE notes.id = $1`,
       values: [id],
     };
     const result = await this._pool.query(query);
@@ -112,6 +116,15 @@ class NotesService {
         throw error;
       }
     }
+  }
+
+  async getUsersByUsername(username) {
+    const query = {
+      text: 'SELECT id, username, fullname FROM users WHERE username LIKE $1',
+      values: [`%${username}%`],
+    };
+    const result = await this._pool.query(query);
+    return result.rows;
   }
 }
 

@@ -8,7 +8,12 @@ export default [
   pluginJs.configs.recommended,
   {
     rules: {
-      'no-undef': 'warn',
+      'no-undef': 'off',
+      'no-unused-vars': 'off',
+      'no-console': 'off',
+      'linebreak-style': 'off',
+      'no-underscore-dangle': 'off',
+      camelcase: 'off',
     },
   },
 ];
