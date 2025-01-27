@@ -8,7 +8,7 @@ export default [
   pluginJs.configs.recommended,
   {
     rules: {
-      'no-undef': 'off',
+      'no-undef': 'warn',
     },
   },
 ];
