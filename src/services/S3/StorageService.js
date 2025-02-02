@@ -22,11 +22,18 @@ class StorageService {
       ContentType: meta.headers['content-type'],
     });
 
-    await this._S3.send(parameter);
+    return new Promise((resolve, reject) => {
+      const url = this.createPreSignedUrl({
+        bucket: process.env.AWS_BUCKET_NAME,
+        key: meta.filename,
+      });
+      this._S3.send(parameter, (error) => {
+        if (error) {
+          return reject(error);
+        }
 
-    return this.createPreSignedUrl({
-      bucket: process.env.AWS_BUCKET_NAME,
-      key: meta.filename,
+        return resolve(url);
+      });
     });
   }
 
